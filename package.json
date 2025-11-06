@@ -4,10 +4,13 @@
   "license": "MIT",
   "author": "jjuidev <jjuidev@gmail.com>",
   "repository": "git@github.com-jjuidev:jjuidev/rxjs.git",
-  "main": "index.js",
+  "main": "./dist/main.js",
   "scripts": {
+    "build": "rimraf build && tsc && tsc-alias",
+    "dev": "tsnd --respawn --cls --rs -r tsconfig-paths/register ./src/main.ts",
     "format": "eslint --fix \"src/**/*.{js,ts,jsx,tsx}\" && prettier --write \"src/**/*.{js,ts,jsx,tsx}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "node ."
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
