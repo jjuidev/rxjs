@@ -1581,6 +1581,267 @@ class DataService {
 
 ---
 
+## Tài Nguyên Học Tập
+
+### ReactiveX Official - https://reactivex.io/
+
+**ReactiveX** là tổ chức và ecosystem đứng sau RxJS và các thư viện Rx khác (RxJava, Rx.NET, RxSwift, v.v.). Website chính thức cung cấp:
+
+#### Đặc điểm nổi bật:
+
+- **Tài liệu đầy đủ**: Documentation chi tiết về Observable, Operators, Subject, Scheduler
+- **Multi-platform**: Hỗ trợ nhiều ngôn ngữ (Java, JavaScript, C#, Scala, Swift, Python, v.v.)
+- **Best practices**: Các pattern và best practices từ cộng đồng
+- **API Reference**: Chi tiết về từng operator với diagram và ví dụ
+
+#### Tại sao nên dùng ReactiveX?
+
+```typescript
+// ReactiveX giúp code asynchronous dễ đọc hơn
+// TRƯỚC (callback hell):
+getData((data) => {
+	processData(data, (processed) => {
+		saveData(processed, (result) => {
+			console.log('Done:', result);
+		});
+	});
+});
+
+// SAU (với RxJS):
+getData$
+	.pipe(
+		switchMap((data) => processData$(data)),
+		switchMap((processed) => saveData$(processed)),
+	)
+	.subscribe((result) => console.log('Done:', result));
+```
+
+#### Các khái niệm cốt lõi từ ReactiveX:
+
+**1. Observer Pattern Done Right**
+
+```typescript
+// Observable có thể emit nhiều giá trị theo thời gian
+const numbers$ = interval(1000).pipe(take(5));
+
+// Nhiều observers có thể subscribe cùng lúc
+numbers$.subscribe((x) => console.log('Observer A:', x));
+numbers$.subscribe((x) => console.log('Observer B:', x));
+```
+
+**2. Functional Programming**
+
+```typescript
+// Operators là pure functions
+of(1, 2, 3, 4, 5)
+	.pipe(
+		filter((x) => x % 2 === 0), // Pure function
+		map((x) => x * 10), // Pure function
+	)
+	.subscribe(console.log); // Side effect chỉ ở đây
+```
+
+**3. Async Error Handling**
+
+```typescript
+// ReactiveX có built-in error handling
+ajax
+	.getJSON('https://api.example.com/data')
+	.pipe(
+		retry(3), // Retry 3 lần
+		catchError((err) => of({ error: err })), // Fallback value
+		finalize(() => console.log('Done')), // Cleanup
+	)
+	.subscribe(
+		(data) => console.log(data),
+		(err) => console.error(err),
+	);
+```
+
+**4. Concurrency Made Easy**
+
+```typescript
+// Schedulers giúp quản lý threading/timing
+import { asyncScheduler } from 'rxjs';
+
+of(1, 2, 3, asyncScheduler).subscribe((x) => console.log(x));
+```
+
+#### Các sections quan trọng trên ReactiveX.io:
+
+- **[Introduction](https://reactivex.io/intro.html)**: Giới thiệu về reactive programming
+- **[Observable](https://reactivex.io/documentation/observable.html)**: Core concept
+- **[Operators](https://reactivex.io/documentation/operators.html)**: Danh sách đầy đủ operators với diagrams
+- **[Subject](https://reactivex.io/documentation/subject.html)**: Multicast và hot observables
+- **[Scheduler](https://reactivex.io/documentation/scheduler.html)**: Quản lý concurrency
+
+---
+
+### RxMarbles - https://rxmarbles.com/
+
+**RxMarbles** là công cụ visualization tương tác cho RxJS operators sử dụng **marble diagrams**. Đây là cách tốt nhất để hiểu cách operators hoạt động.
+
+#### Marble Diagram là gì?
+
+Marble diagram là cách biểu diễn trực quan luồng dữ liệu theo thời gian:
+
+```
+Input:   --1--2--3--4--5--|
+            map(x => x * 10)
+Output:  --10-20-30-40-50-|
+
+Ký hiệu:
+- (dash)     : Timeline, mỗi dash là 1 đơn vị thời gian
+1,2,3        : Giá trị được emit
+|            : Complete
+X            : Error
+```
+
+#### Cách sử dụng RxMarbles:
+
+**1. Chọn Operator**: Click vào operator bạn muốn học (map, filter, merge, v.v.)
+
+**2. Kéo thả Marbles**: Drag các marble (hình tròn) trên timeline để thay đổi timing
+
+**3. Quan sát Output**: Xem kết quả thay đổi real-time
+
+**4. Thử nghiệm**: Thêm/bớt marble, thay đổi timing để hiểu rõ behavior
+
+#### Ví dụ operators phổ biến trên RxMarbles:
+
+**map()** - Transform mỗi giá trị:
+
+```
+Input:   -1---2---3-|
+         map(x => x * 10)
+Output:  -10--20--30-|
+```
+
+**filter()** - Lọc giá trị:
+
+```
+Input:   -1-2-3-4-5-6-|
+         filter(x => x % 2 === 0)
+Output:  ---2---4---6-|
+```
+
+**merge()** - Merge nhiều streams:
+
+```
+Input1:  -1---3---5--|
+Input2:  --2---4---6-|
+         merge()
+Output:  -1-2-3-4-5-6-|
+```
+
+**switchMap()** - Switch sang stream mới:
+
+```
+Input:   -a-------b-----c-|
+         switchMap(x => --x-x-x-|)
+Output:  ---a-a-a-b-b-b-c-c-c-|
+         (mỗi letter emit stream riêng)
+```
+
+**debounceTime()** - Chờ im lặng:
+
+```
+Input:   -a-b-c--d-------e-|
+         debounceTime(2 ticks)
+Output:  -------c--------e-|
+```
+
+**combineLatest()** - Combine latest values:
+
+```
+Input1:  -1-----2-----3-|
+Input2:  ---a-----b-------|
+         combineLatest()
+Output:  ---1a--2a-2b-3b-|
+```
+
+#### Lợi ích của RxMarbles:
+
+✅ **Visual Learning**: Dễ hiểu hơn việc đọc docs
+
+✅ **Interactive**: Thử nghiệm real-time
+
+✅ **So sánh Operators**: Hiểu sự khác biệt giữa switchMap, mergeMap, concatMap
+
+✅ **Debug**: Visualize vấn đề trong code của bạn
+
+✅ **Chia sẻ**: Share link với team để giải thích logic
+
+#### Operators nên thử trên RxMarbles:
+
+**Transformation:**
+
+- `map`, `switchMap`, `mergeMap`, `concatMap`, `exhaustMap`
+- `scan`, `reduce`, `buffer`, `bufferTime`
+
+**Filtering:**
+
+- `filter`, `take`, `skip`, `debounceTime`, `throttleTime`
+- `distinctUntilChanged`, `first`, `last`
+
+**Combination:**
+
+- `combineLatest`, `merge`, `concat`, `zip`, `forkJoin`
+- `withLatestFrom`, `startWith`
+
+**Error Handling:**
+
+- `catchError`, `retry`, `retryWhen`
+
+#### Tips khi dùng RxMarbles:
+
+```typescript
+// 1. Sau khi hiểu marble diagram, code sẽ rõ ràng hơn
+fromEvent(searchInput, 'input').pipe(
+	debounceTime(300), // Chờ user ngừng gõ 300ms
+	distinctUntilChanged(), // Bỏ qua nếu giống giá trị trước
+	switchMap((term) => api.search(term)), // Cancel request cũ
+);
+
+// 2. So sánh operators tương tự
+// mergeMap: Giữ tất cả requests (có thể disorder)
+// switchMap: Cancel request cũ (cho search)
+// concatMap: Chờ request trước xong (giữ order)
+// exhaustMap: Ignore request mới (cho button spam)
+
+// 3. Debug bằng cách vẽ marble diagram
+// Input:  --s--e--a--r--ch----
+// debounce(300): -----------ch----
+// switchMap: -----------[API]---result--
+```
+
+---
+
+### Tài nguyên khác
+
+**Online Playgrounds:**
+
+- [StackBlitz RxJS](https://stackblitz.com/): Code và test RxJS online
+- [RxViz](https://rxviz.com/): Visualize custom Observable streams
+
+**Learning Resources:**
+
+- [Learn RxJS](https://www.learnrxjs.io/): Examples và use cases
+- [RxJS Official Docs](https://rxjs.dev/): Documentation chính thức
+- [Reactive.how](https://reactive.how/): Animated tutorials
+
+**Books:**
+
+- "RxJS in Action" - Paul Daniels & Luis Atencio
+- "Learning Observable" - Kim Maida
+
+**Videos:**
+
+- [RxJS Quick Start](https://egghead.io/courses/rxjs-beyond-the-basics-creating-observables-from-scratch)
+- [RxJS Operators in Depth](https://www.youtube.com/c/rxjs)
+
+---
+
 ## Kết luận
 
 RxJS 7 cung cấp công cụ mạnh mẽ để xử lý lập trình bất đồng bộ và reactive. Các operators phổ biến nhất bao gồm:
@@ -1598,3 +1859,10 @@ RxJS 7 cung cấp công cụ mạnh mẽ để xử lý lập trình bất đồ
 **Utility**: `tap`, `delay`, `shareReplay`, `finalize`
 
 Hãy chọn operator phù hợp với use case của bạn và luôn nhớ unsubscribe để tránh memory leaks!
+
+**Để học RxJS hiệu quả:**
+
+1. Bắt đầu với [ReactiveX.io](https://reactivex.io/) để hiểu concepts
+2. Dùng [RxMarbles.com](https://rxmarbles.com/) để visualize operators
+3. Thực hành với các use cases thực tế trong document này
+4. Tham gia community và đọc code của người khác
